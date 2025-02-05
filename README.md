@@ -84,3 +84,55 @@ export default tseslint.config({
   + onClick={() => helloW()}  // truyền đc thêm param
   + onClick={helloW} // ko có param
 => event handlers phải được truyền vào trong button, nếu không thì event sẽ bị gọi khi render
+- Event propagation : event ở cả dom child và parent dom => cần phải stop propagation, để dừng sự lan truyền
+- e.preventDefault() : Ngăn chặn hành vi mặc định
+# REACT STATE
+-  local variable bị reset mỗi lần render lại, khi component render lại nó sẽ render lại từ đầu
+-  update local variable thì sẽ ko trigger render => component không render lại để cập nhật dữ liệu mới
+=> dùng hook useState để giữ dữ liệu giữa các lần render, hàm setter trong useState giúp rerender component
+- Hook là các hàm đặc biệt, khả dụng khi react đang render, bắt đầu = use
+- mỗi state là riêng biệt, khi thay đổi 1 state thì ko liên quan đến state khác.
+# Render - Commit
+- bước 1 Triggering a render: 
+  + component được init
+  + state hoặc component cha được update
+- bước 2 Rendering the component
+  + render cách DOM nodes cho các tags
+  + trong re-render, tính toán xem cái nào cần render và ko cần render lại
+- bước 3 Committing to the DOM
+  + react sử dụng dom api để đưa dom lên màn hình
+  + react chỉ thay đổi dom có sự thay đổi so với lần trc
+- update trạng thái nhiều lần trong 1 lần thìu dùng arrow function: setNumber(n => n + 1), vì mỗi lần set, yêu cầu kết xuất để update
+# Update State Object
+- immutable: string, number, booleans : các giá trị : 1 ,2 ,3 .. 'abc'  true|false là các giá trị bất biến (gán a = b = 5, b thay đổi thì a ko thay đổi )
+- mutation: còn lại
+- useState có thể lưu tất cả các loại dữ liệu
+- update state của object, vẫn phải dùng hàm set, để render lại
+- Dùng use-immer để khỏi cần copy lại object khi setState, chỉ cần set trường cần thiết
+- mảng trong state cũng chỉ đọc => ko sử dụng arr[0] = 'bird', push, pop
+- khi muốn update mảng, truyền mảng mới vào hàm set, 
+- mutate array: push, unshift, pop, shift, splice, splice, arr[i] = ... , reverse, sort
+- new Array: concat, [...arr] spread syntax, filter, slice, map
+- thay đổi dl 1 object trong array dùng ... spread syntax và map
+- sử dụng immer thì  dùng đc những mutate array, dùng cả với khi update data object trong array. => dùng immer để thay đổi dữ liệu mutation
+=> có thể đưa mảng vào state, và ko thể thay đổi, nếu muốn thay đổi sử dụng immer hoặc tạo mảng mới và cập nhật vào state
+
+# Điều khiển Input với state
+- Giống như thuê taxi, bạn chỉ cần cung cấp điểm đón và điểm đến, lái đến thế nào taxi quyết định (taxi = react)
+- 5 step setup
+  + Xác định các state của component => (Identify your component’s different visual states)
+  + Xác định những gì kích hoạt thay đổi state => (Determine what triggers those state changes)
+  + xử dụng "useState" để khai báo 1 state => (Represent the state in memory using useState)
+  + Xóa state ko cần thiết => (Remove any non-essential state variables)
+  + Connect các handler event với setState => (Connect the event handlers to set the state)
+
+- Xem xét kỹ để tổ chức các state: từng state hay nhóm gộp
+  + Nhóm các trạng thái (Group related state): Cân nhắc kỹ việc gộp các trạng thái
+  + Tránh mâu thuẫn trong state (Avoid contradictions in state): nên tránh các state mâu thuẫn
+  + Tránh dư thừa state (redundant state)
+  + Tránh trùng lặp trạng thái (duplication in state)
+  + Tránh deeply nested state 
+
+- Lifting state up: Thay vì 2 component con có state riêng biệt để quản lý vấn đề giống nhau, thì để trạng thái lên component cha quản lý.
+
+- PRESERVING ADN RESETTING STATE
