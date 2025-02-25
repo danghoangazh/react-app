@@ -28,6 +28,7 @@ export const DialogContent = React.forwardRef<
           {children}
         </ChakraDialog.Content>
       </ChakraDialog.Positioner>
+    
     </Portal>
   )
 })

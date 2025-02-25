@@ -99,6 +99,7 @@ export default tseslint.config({
   => dùng hook useState để giữ dữ liệu giữa các lần render, hàm setter trong useState giúp rerender component
 - Hook là các hàm đặc biệt, khả dụng khi react đang render, bắt đầu = use
 - mỗi state là riêng biệt, khi thay đổi 1 state thì ko liên quan đến state khác.
+- Cập nhật state dựa trên giá trị trước đó: cần dùng callback : setCount(prevCount => prevCount + 1);
 
 # Render - Commit
 
@@ -150,7 +151,65 @@ export default tseslint.config({
 - Lifting state up: Thay vì 2 component con có state riêng biệt để quản lý vấn đề giống nhau, thì để trạng thái lên component cha quản lý.
 
 - PRESERVING ADN RESETTING STATE
+
   - mỗi component render ra là độc lập, tuy nhiên là 2 component ở 1 vị trí dome node thì nó là 1 (ẩn hiện 1 trong 2 component) => React giữ state nếu cùng 1 component và được hiển thị cùng chỗ
   - 2 cách để reset state của same component:
     Hiển thị same component ở vị trí khác nhau
     Sử dụng Key cho các component
+
+- USEREDUCER: Xử lý các state phức tạp, hiệu quả hơn. -> gom logic state vào 1 reducer để quản lý
+
+  - đầu vào : logic xử lý và dữ liệu đầu vào
+  - trả về : data hiện tại và 1 dispatch function
+  - là 1 pure function thuần túy
+    bước 1: tạo reducer và init state
+    bước 2: Sử dụng useReducer
+
+- CONTEXT: Truyền data từ paren -> child ở xa, mà ko cần truyền qua các child ko cần thiết, mục đích chia sẻ dữ liệu mà ko cần truyền props qua từng cấp
+
+  bước 1: tạo Context // createContext(value)
+  const ThemeContext = createContext('light');
+
+  bước 2: Cung cấp context //
+  <ThemeContext.Provider value="dark">
+  <Toolbar />
+  </ThemeContext.Provider>
+
+  bước 3: Sử dụng Context
+  const theme = useContext(ThemeContext);
+  => trước khi dùng context, hãy thử dùng props hoặc jsx as children
+
+- Combining CONTEXT + REDUCER
+
+  bước 1: CREATE context
+
+  - tạo 1 bộ reducer : dữ liệu x + function dispatch y
+  - tạo 2 context riêng biệt, 1 để cung cấp dữ liệu x hiện tại, 1 để cung cấp function dispatch
+    bước 2: PUT state và dispatch vào context
+  - truyền dữ liệu reducer vào từng context
+    const [xData, yDispatch] = useReducer(tasksReducer, initialTasks);
+
+  <TasksContext.Provider value={xData}>
+  <TasksDispatchContext.Provider value={yDispatch}>
+  ... component trong đây
+  </TasksDispatchContext.Provider>
+  </TasksContext.Provider>
+  bước 3: USE context bất cứ đâu ở trong tree
+
+  - trong các component con sử dụng các context để lấy dữ liệu xData và yDispatch từ reducer, bằng cách dùng useContext
+  *note: có thể chuyển reducer + context vào 1 file
+
+- Refs: Lưu một số dữ liệu nhưng không re-render component khi dl đó thay đổi
+  ex: lưu interval của timeout
+  - useRef(initialValue) trả về { current: initialValue }
+  => sử dụng khi cần lưu giá trị, nhưng ko ảnh hưởng đến logic kết xuất
+
+- Refs with DOM
+  + để truy cập vào DOM, sử dụng useRef hook
+    ex: <div ref={myRef}>
+  + ref có thể sử dụng như props để điều khiển child component
+    ex: <MyInput ref={inputRef} />
+    
+        function MyInput({ ref }) {
+          return <input ref={ref} />;
+}

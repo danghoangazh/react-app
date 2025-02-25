@@ -8,12 +8,7 @@ import { useState } from "react";
 export default function About() {
   const [clicky, setClicky] = useState(0);
   const location = useLocation();
-  // const param = useParams();
-  // const [searchParams] = useSearchParams();
-  // console.log(queryString.parse(location.search));
   const name = queryString.parse(location.search).name;
-  // console.log("param: ", param);
-  // console.log("searchParams: ", searchParams.getAll("q"));
   function helloW(val: number) {
     console.log("==> ");
     console.log("hello everybody", name, val);
