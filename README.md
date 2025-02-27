@@ -94,6 +94,12 @@ export default tseslint.config({
 
 # REACT STATE
 
+- Các biến bình thường ko được react theo dõi, khi chúng thay đổi => React cũng ko biết để cập nhập UI => vì thế chỉ dùng để
+
+  - Lưu giá trị tạm thời, ko hiện UI
+  - tính toán trung gian
+  - Lưu trữ tham chiếu DOM
+
 - local variable bị reset mỗi lần render lại, khi component render lại nó sẽ render lại từ đầu
 - update local variable thì sẽ ko trigger render => component không render lại để cập nhật dữ liệu mới
   => dùng hook useState để giữ dữ liệu giữa các lần render, hàm setter trong useState giúp rerender component
@@ -114,6 +120,33 @@ export default tseslint.config({
   - react chỉ thay đổi dom có sự thay đổi so với lần trc
 - update trạng thái nhiều lần trong 1 lần thìu dùng arrow function: setNumber(n => n + 1), vì mỗi lần set, yêu cầu kết xuất để update
 
+- 4 lý do component re-render:
+  - state thay đổi,
+  - re-render parent
+  - thay đổi context
+  - thay đổi hook
+  - Forced Update
+  - thay đổi Key
+    => Sử dụng React.memo, useMemo, useCallback để tránh re-render không cần thiết.
+    Props không bị ảnh hưởng bởi sự thay đổi trạng thái
+
+* LƯU Ý
+
+- KHÔNG NÊN: tạo component bên trong hàm render của 1 component khác
+- NÊN : ngăn chặn re-render với composition: MOVE STATE DOWN,
+- NÊN : Ngăn chặn việc re-render với composition: children as Props (tách component thành component nhỏ, component phức tạp thành props của 1 component xử lý, để tránh việc render component ko liên quan nhưng lại render component phức tạp )
+- NÊN : Ngăn chặn việc re-render với composition: components as props, giống với cái trên (<MovieList   child={<MoveItem />}>)
+- Ngăn chặn Re-Render với React.meno
+    + 1 React.memo: Component với props
+    + 2 React.memo: Component as Props hoặc children
+- KHÔNG NÊN: useMemo/useCallback không cần thiết trên props
+- NÊN: useMemo/useCallback cần thiết
+- NÊN: useMemo dành cho các phép tính tốn kém
+- Ngăn chặn re-render do Context
+  + memoizing giá trị Provider
+  + phân chia dữ liệu và API
+  + chia dữ liệu thành từng khối
+  + Context Selector
 # Update State Object
 
 - immutable: string, number, booleans : các giá trị : 1 ,2 ,3 .. 'abc' true|false là các giá trị bất biến (gán a = b = 5, b thay đổi thì a ko thay đổi )
@@ -149,13 +182,15 @@ export default tseslint.config({
   - Tránh deeply nested state
 
 - Lifting state up: Thay vì 2 component con có state riêng biệt để quản lý vấn đề giống nhau, thì để trạng thái lên component cha quản lý.
+  => trong quá trình làm việc nên tổ chức state có thể di chuyển state lên xuống giữa các component sao cho hợp lý (lift it up - move state down)
 
 - PRESERVING ADN RESETTING STATE
 
   - mỗi component render ra là độc lập, tuy nhiên là 2 component ở 1 vị trí dome node thì nó là 1 (ẩn hiện 1 trong 2 component) => React giữ state nếu cùng 1 component và được hiển thị cùng chỗ
+  - mặc định, React giữ nguyên state của component NẾU nó được render cùng vị trí trong tree component cùng loại component
   - 2 cách để reset state của same component:
-    Hiển thị same component ở vị trí khác nhau
-    Sử dụng Key cho các component
+    - Hiển thị same component ở vị trí khác nhau
+    - Sử dụng Key cho các component ( ko dùng index, key phải unique, và ổn định giữa các lần render)
 
 - USEREDUCER: Xử lý các state phức tạp, hiệu quả hơn. -> gom logic state vào 1 reducer để quản lý
 
@@ -197,19 +232,59 @@ export default tseslint.config({
   bước 3: USE context bất cứ đâu ở trong tree
 
   - trong các component con sử dụng các context để lấy dữ liệu xData và yDispatch từ reducer, bằng cách dùng useContext
-  *note: có thể chuyển reducer + context vào 1 file
+    \*note: có thể chuyển reducer + context vào 1 file
 
 - Refs: Lưu một số dữ liệu nhưng không re-render component khi dl đó thay đổi
   ex: lưu interval của timeout
+
   - useRef(initialValue) trả về { current: initialValue }
-  => sử dụng khi cần lưu giá trị, nhưng ko ảnh hưởng đến logic kết xuất
+    => sử dụng khi cần lưu giá trị, nhưng ko ảnh hưởng đến logic kết xuất
 
 - Refs with DOM
-  + để truy cập vào DOM, sử dụng useRef hook
+
+  - để truy cập vào DOM, sử dụng useRef hook
     ex: <div ref={myRef}>
-  + ref có thể sử dụng như props để điều khiển child component
+  - ref có thể sử dụng như props để điều khiển child component
     ex: <MyInput ref={inputRef} />
-    
-        function MyInput({ ref }) {
-          return <input ref={ref} />;
-}
+    function MyInput({ ref }) {
+    return <input ref={ref} />;
+    }
+
+- Synchronizing with Effects
+
+  - Effect là các tác vụ side effects xảy ra sau khi component render xong.
+  - đồng bộ component với các hệ thống bên ngoài (API, DOM, subscriptions, third-party libraries) khi cần xử lý side effects sau khi render.
+  - Effects chạy sau khi render và phản ứng với thay đổi state/props
+  - Cú pháp:
+    useEffect(() => {
+    // Logic của Effect
+    return () => { /_ Cleanup logic _/ };
+    }, [dependencies]);
+
+    1/ chứa logic chính của Effect
+    2/ mảng phụ thuộc: --- KHÔNG CÓ MẢNG : Effect chạy sau mỗi lần render
+    --- Mảng rỗng [] : Effect chỉ chạy 1 lần sau khi component mount
+    --- có dependencies: Effect chạy lại khi các giá trị trong mảng thay đổi
+    3/ cleanup function: dọn dẹp tài nguyên, trước khi component unmount hoặc trước khi effect chạy lại . ex: clearnInterval, unsubcriberSocket
+
+  - quản lý dependencies: mội giá trị động được sử dụng trong effect phải được khai báo trong mảng dependencies
+  - case sử dụng phổ biến : Fetch dữ liệu, đăng ký event (window.addEventlistener), tương tác với dom
+  - tách biệt các Effect với nhau. mỗi Effects xử lý 1 nv
+  - tránh Effect ko cần thiết,clearnup để tránh rò rỉ,
+
+- Trường hợp ko cần sử dụng useEffects
+  2 trường hợp phổ biến mà ko cần Effects
+
+  - Chuyển đổi dữ liệu để render (tránh lặp đi lặp lại việc render)
+  - Xử lý sự kiện người dùng
+
+  Ví dụ phổ biến, thay vì sử dụng Effect thì có cách sau:
+
+  - Cập nhập 1 state dựa trên props hoặc state : ví dụ state fullname = first_name + last_name, thay vào đó chỉ cần chuyển full_name thành biến = first_name + last_name . ko cần
+    coi là 1 state, thay vào đó tính toán nó trong quá trình rendering
+
+  - Caching các phép toán phức tạp, mà ko cần tính toán lại khi dependency thay đổi: sử dụng useMeno hook // const cachedValue = useMemo(calculateValue, [dependencies]), cho phép tính toán lại khi phụ thuộc thay đổi
+
+  - Reset lại state khi props thay đổi: sử dụng việc component re-render khi key thay đổi, để thay đổi state ở component con
+
+  - Tính toán lại 1 vài data (not use useState) khi props thay đổi, ko cần sử dụng use Effect với dependency là props
