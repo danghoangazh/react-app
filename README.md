@@ -1,53 +1,3 @@
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from "eslint-plugin-react";
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: "18.3" } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs["jsx-runtime"].rules,
-  },
-});
-```
 
 # ROUTER
 
@@ -80,6 +30,10 @@ export default tseslint.config({
 - Component is Pure: react thiết kế theo concept này, mọi component đều là pure function => ở strict mode component render 2 lần để kiểm tra component có phải là pure, component ko nên thay đổi bất kỳ đối tượng và biến nào (Same inputs, same output)
 - side effects: thay đổi, update màn hình, chạy animation hoặc thay đổi data gọi là SIDE EFFECTS, thường nằm trong event handlers. event handlers không chạy trong lúc render => event handlers không cần phải thuần túy
 
+- Vòng đời component
+  + mounts: khi nó được thêm vào màn hình
+  + updated: khi nhận props hoặc state mới, ho
+  + unmounts: khi component bị xóa khỏi màn hình
 # REACT EVENTS
 
 - function :
@@ -250,7 +204,7 @@ export default tseslint.config({
     return <input ref={ref} />;
     }
 
-- Synchronizing with Effects
+- Synchronizing with Effects: useEffect
 
   - Effect là các tác vụ side effects xảy ra sau khi component render xong.
   - đồng bộ component với các hệ thống bên ngoài (API, DOM, subscriptions, third-party libraries) khi cần xử lý side effects sau khi render.
@@ -273,18 +227,55 @@ export default tseslint.config({
   - tránh Effect ko cần thiết,clearnup để tránh rò rỉ,
 
 - Trường hợp ko cần sử dụng useEffects
-  2 trường hợp phổ biến mà ko cần Effects
 
-  - Chuyển đổi dữ liệu để render (tránh lặp đi lặp lại việc render)
-  - Xử lý sự kiện người dùng
+  2 trường hợp phổ biến mà ko cần Effects
+  - Chuyển đổi, Biến đổi dữ liệu để render (tránh lặp đi lặp lại việc render): Không cần Effect nếu logic chỉ để tính toán dữ liệu từ props/state. Thay vào đó, tính trực tiếp trong    component
+  - Xử lý sự kiện người dùng:  Dùng event handlers (như onClick, onSubmit) thay vì Effect.
+  - Đồng bộ state với props: Thay vì dùng Effect để cập nhật state khi props thay đổi, hãy tính toán trực tiếp trong render hoặc dùng key để reset state.
+  - Tránh fetch trong Effect mà không có cleanup. Dùng thư viện như React Query, SWR để xử lý caching, retry, SSR.
 
   Ví dụ phổ biến, thay vì sử dụng Effect thì có cách sau:
 
   - Cập nhập 1 state dựa trên props hoặc state : ví dụ state fullname = first_name + last_name, thay vào đó chỉ cần chuyển full_name thành biến = first_name + last_name . ko cần
     coi là 1 state, thay vào đó tính toán nó trong quá trình rendering
-
   - Caching các phép toán phức tạp, mà ko cần tính toán lại khi dependency thay đổi: sử dụng useMeno hook // const cachedValue = useMemo(calculateValue, [dependencies]), cho phép tính toán lại khi phụ thuộc thay đổi
+  - Reset state dựa trên props: 
+    + Không nên: Dùng Effect để reset state khi prop thay đổi.
+    + Dùng key để React tự động reset component
+  - Xử lý event từ user: Nên Gọi trực tiếp trong event handler
+  - Fetch dữ liệu 
+    + Nên: Dùng thư viện chuyên dụng (React Query, SWR) hoặc cleanup Effect
 
-  - Reset lại state khi props thay đổi: sử dụng việc component re-render khi key thay đổi, để thay đổi state ở component con
+- Khi nào CẦN dùng Effect: Đồng bộ với hệ thống bên ngoài như DOM, API animation, subscription (WebSocket).
 
-  - Tính toán lại 1 vài data (not use useState) khi props thay đổi, ko cần sử dụng use Effect với dependency là props
+- Quy tắc vàng
+  Tránh Effect cho logic có thể xử lý qua:
+  ✨ Render logic (tính toán từ props/state)
+  ✨ Event handlers (click, submit, input)
+  ✨ Thư viện chuyên dụng (React Query, Formik, Redux).
+
+- Lifecycle of Reactive Effects
+  + Vòng đời của Effect: Effect chạy sau mỗi lần render, bắt đầu đồng bộ và dừng đồng bộ (khi component unmount hoặc dependencies thay đổi)
+  + Phụ thuộc vào Dependencies: Effect chỉ chạy lại nếu dependencies (props/state) thay đổi. Không được bỏ qua dependencies (dù có thể gây lặp), thay vào đó sử dụng state updater hoặc ref để xử lý giá trị thay đổi liên tục.
+  + Cleanup Function: Mỗi Effect có thể trả về hàm cleanup để hủy tác vụ (ngắt kết nối, hủy subscription, etc.). Cleanup được gọi trước khi Effect chạy lại hoặc component unmount
+  + Luồng hoạt động 
+
+    Mount: Chạy Effect → Cleanup khi unmount.
+    Update: Chạy Cleanup cũ → Chạy Effect mới (nếu dependencies thay đổi).
+    Unmount: Chạy Cleanup.
+  + Cẩn thận Infinite Loop (Khi Effect cập nhật state mà state đó lại nằm trong dependency.) và Memory Leak (ko cleanup các subsubscriptions/timers khi component unmount)
+
+- tách biệt giữa event và Effect 
+  + Không dùng Effect để xử lý sự kiện: Event handlers là nơi thích hợp cho logic tương tác người dùng
+  + Effect chỉ dành cho đồng bộ hóa: Kết nối, ngắt kết nối, fetch dữ liệu khi dependencies thay đổi.
+  Luôn đặt câu hỏi: "Logic này có phải là phản ứng với một hành động người dùng, hay là đồng bộ với hệ thống bên ngoài?"
+
+- LOẠI BỎ DEPENDENCIES không cần thiết
+  + Vì sao: Có nguy cơ dẫn đến việc useEffect chạy quá nhiều lần hoặc gây ra lỗi.
+  + cần đảm bảo rằng tất cả các giá trị reactive được sử dụng trong useEffect đều được liệt kê trong mảng dependencies
+  +  Để loại bỏ một dependency, bạn cần chứng minh rằng nó không cần thiết bằng cách thay đổi code
+  + useMemo: Cache kết quả tính toán, chỉ chạy lại khi dependencies thay đổi
+  + useCallback: Cache hàm, tránh tạo lại hàm mới mỗi lần render, giảm số lần useEffect chạy lại
+
+- Custom Hooks
+  + dùng để tái sử dụng logic giữa các component mà không cần sao chép code.
