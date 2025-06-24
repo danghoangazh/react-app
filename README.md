@@ -1,11 +1,10 @@
-
-# ROUTER
+### ROUTER ###
 
 - sử dụng react-router
 - sử dụng lib: query-string để lấy query string từ url
 - param và string
 
-# COMPONENT
+### COMPONENT ###
 
 - ứng dụng react tất cả đều là component
 - sử dụng function component
@@ -34,7 +33,8 @@
   + mounts: khi nó được thêm vào màn hình
   + updated: khi nhận props hoặc state mới, ho
   + unmounts: khi component bị xóa khỏi màn hình
-# REACT EVENTS
+  
+### REACT EVENTS ###
 
 - function :
   - trong component,
@@ -46,7 +46,7 @@
 - Event propagation : event ở cả dom child và parent dom => cần phải stop propagation, để dừng sự lan truyền
 - e.preventDefault() : Ngăn chặn hành vi mặc định
 
-# REACT STATE
+### REACT STATE ###
 
 - Các biến bình thường ko được react theo dõi, khi chúng thay đổi => React cũng ko biết để cập nhập UI => vì thế chỉ dùng để
 
@@ -61,7 +61,7 @@
 - mỗi state là riêng biệt, khi thay đổi 1 state thì ko liên quan đến state khác.
 - Cập nhật state dựa trên giá trị trước đó: cần dùng callback : setCount(prevCount => prevCount + 1);
 
-# Render - Commit
+### Render - Commit ###
 
 - bước 1 Triggering a render:
   - component được init
@@ -101,7 +101,8 @@
   + phân chia dữ liệu và API
   + chia dữ liệu thành từng khối
   + Context Selector
-# Update State Object
+
+### Update State Object ###
 
 - immutable: string, number, booleans : các giá trị : 1 ,2 ,3 .. 'abc' true|false là các giá trị bất biến (gán a = b = 5, b thay đổi thì a ko thay đổi )
 - mutation: còn lại
@@ -116,7 +117,7 @@
 - sử dụng immer thì dùng đc những mutate array, dùng cả với khi update data object trong array. => dùng immer để thay đổi dữ liệu mutation
   => có thể đưa mảng vào state, và ko thể thay đổi, nếu muốn thay đổi sử dụng immer hoặc tạo mảng mới và cập nhật vào state
 
-# Điều khiển Input với state
+### Điều khiển Input với state ###
 
 - Giống như thuê taxi, bạn chỉ cần cung cấp điểm đón và điểm đến, lái đến thế nào taxi quyết định (taxi = react)
 - 5 step setup
@@ -216,7 +217,8 @@
     }, [dependencies]);
 
     1/ chứa logic chính của Effect
-    2/ mảng phụ thuộc: --- KHÔNG CÓ MẢNG : Effect chạy sau mỗi lần render
+    2/ mảng phụ thuộc: 
+    --- KHÔNG CÓ MẢNG : Effect chạy sau mỗi lần render
     --- Mảng rỗng [] : Effect chỉ chạy 1 lần sau khi component mount
     --- có dependencies: Effect chạy lại khi các giá trị trong mảng thay đổi
     3/ cleanup function: dọn dẹp tài nguyên, trước khi component unmount hoặc trước khi effect chạy lại . ex: clearnInterval, unsubcriberSocket
@@ -278,4 +280,21 @@
   + useCallback: Cache hàm, tránh tạo lại hàm mới mỗi lần render, giảm số lần useEffect chạy lại
 
 - Custom Hooks
-  + dùng để tái sử dụng logic giữa các component mà không cần sao chép code.
+  + dùng để tái sử dụng logic giữa các component mà không cần sao chép code, là một hàm
+  + bắt đầu bằng: use | ví dụ: useFetch, useForm, useLocalStorage.
+  + dùng các hook khác bên trong : useState, useEffect, useContext
+  + Ko chia sẻ trạng thái, giá trị trả về linh hoạt.
+  + ko gọi hook trong (if) và for hoặc hàm lồng nhau
+  => giúp tránh lặp code, tách biệt logic và giao diện, dễ test, bảo trì
+  => ứng dụng: useLocalStorage, useDarkMode, useWindowSize ...
+
+### HOOK ###
+
+- STATE HOOKS: useState, useReducer // state cho phép "nhớ" thông tin như là user input
+  + useState: Cho phép thêm biến trạng thái vào component   // const [state, setState] = useState(initialState)
+    > Update dựa trên previous state:  các state trong component đc coi là 1 snapshot => dùng arrrow function để cập nhập liên tiếp, vì nó lấy "Pending state" để tính toán "Next State" mới nhất.
+    > Update Object and Arrays: state is Read-only => nên chỉ "Thay thế" thay vì làm "Thay đổi" object hoặc array state
+    
+  + useEffect: dùng để thực hiện các tác vụ side effects (lấy dữ liệu, event listener, update dom), chạy sau mỗi lần render, hoặc phụ thuộc dependency
+  + useContext: Cho phép truy cập vào context từ các thành phần cha mà không cần qua Props
+  + useReducer: 

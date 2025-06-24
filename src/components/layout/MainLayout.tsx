@@ -3,7 +3,9 @@ import { Outlet } from "react-router";
 export default function MainLayout() {
   return (
     <>
-      THIS IS LAYOUT
+      <header>
+        <h1>HEADER</h1>
+      </header>
       <Outlet />
     </>
   );
