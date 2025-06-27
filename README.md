@@ -290,11 +290,30 @@
 
 ### HOOK ###
 
-- STATE HOOKS: useState, useReducer // state cho phép "nhớ" thông tin như là user input
+- STATE HOOKS -
+
+  useState, useReducer // state cho phép "nhớ" thông tin như là user input
   + useState: Cho phép thêm biến trạng thái vào component   // const [state, setState] = useState(initialState)
     > Update dựa trên previous state:  các state trong component đc coi là 1 snapshot => dùng arrrow function để cập nhập liên tiếp, vì nó lấy "Pending state" để tính toán "Next State" mới nhất.
-    > Update Object and Arrays: state is Read-only => nên chỉ "Thay thế" thay vì làm "Thay đổi" object hoặc array state
-    
-  + useEffect: dùng để thực hiện các tác vụ side effects (lấy dữ liệu, event listener, update dom), chạy sau mỗi lần render, hoặc phụ thuộc dependency
+    > Update Object and Arrays: state is Read-only => nên chỉ "Thay thế" thay vì làm "Thay đổi" object hoặc array state. tránh xa việc mutation (có thể sử dụng Immer)
+    > giá trị khởi tạo, ngoài truyền giá trị chính xác thì có thể sử dụng "Hàm" làm tham số
+    > dùng "Key" để reset component
+
+  + useReducer: Dùng để quản lý state phức tạp hơn, thường kết hợp với một reducer function.
+    // const [state, dispatch] = useReducer(reducer, initialArg, init?)
+    >  "reducer" là "Pure function", có 2 parameter: "state" hiện tại và "action" , và trả về "next State"
+    > initialArg : Trạng thái ban đầu của hook
+    > init? : function để tính toán, nếu ko có thì trả về "initialArg" ngược lại thì lấy "initialArg" làm param đầu vào
+    > useReducer: luôn trả về  [state, dispatch], dispatch function cho phép "cập nhập" state và kích hoạt "re-render"
+    > dispatch: pass action làm parameter, chỉ để kích hoạt reducer, không có gia trị trả về
+    > lưu ý là State "chỉ đọc", chỉ "thay thế" nó 
+
+- CONTEXT HOOK -
+
   + useContext: Cho phép truy cập vào context từ các thành phần cha mà không cần qua Props
-  + useReducer: 
+    const value = useContext(SomeContext)
+    > cần tạo context trước, example: ThemeContext = createContext("white | black")
+    > ở compoment Cha sử dụng <ThemeContext value = "abc"></ThemeContext> wrap component con
+    > ở component cần sử dụng context const theme = useContext(ThemeContext);
+    > thay đổi ở value ở context bằng cách sử dụng chung với useState để set lại
+  
