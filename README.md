@@ -124,7 +124,7 @@
 
   - Xác định các state của component => (Identify your component’s different visual states)
   - Xác định những gì kích hoạt thay đổi state => (Determine what triggers those state changes)
-  - xử dụng "useState" để khai báo 1 state => (Represent the state in memory using useState)
+  - xử dụng 'useState' để khai báo 1 state => (Represent the state in memory using useState)
   - Xóa state ko cần thiết => (Remove any non-essential state variables)
   - Connect các handler event với setState => (Connect the event handlers to set the state)
 
@@ -161,7 +161,7 @@
   const ThemeContext = createContext('light');
 
   bước 2: Cung cấp context //
-  <ThemeContext.Provider value="dark">
+  <ThemeContext.Provider value='dark'>
   <Toolbar />
   </ThemeContext.Provider>
 
@@ -270,7 +270,7 @@
 - tách biệt giữa event và Effect 
   + Không dùng Effect để xử lý sự kiện: Event handlers là nơi thích hợp cho logic tương tác người dùng
   + Effect chỉ dành cho đồng bộ hóa: Kết nối, ngắt kết nối, fetch dữ liệu khi dependencies thay đổi.
-  Luôn đặt câu hỏi: "Logic này có phải là phản ứng với một hành động người dùng, hay là đồng bộ với hệ thống bên ngoài?"
+  Luôn đặt câu hỏi: 'Logic này có phải là phản ứng với một hành động người dùng, hay là đồng bộ với hệ thống bên ngoài?'
 
 - LOẠI BỎ DEPENDENCIES không cần thiết
   + Vì sao: Có nguy cơ dẫn đến việc useEffect chạy quá nhiều lần hoặc gây ra lỗi.
@@ -291,29 +291,89 @@
 ### HOOK ###
 
 - STATE HOOKS -
-
-  useState, useReducer // state cho phép "nhớ" thông tin như là user input
+  useState, useReducer // state cho phép 'nhớ' thông tin như là user input
   + useState: Cho phép thêm biến trạng thái vào component   // const [state, setState] = useState(initialState)
-    > Update dựa trên previous state:  các state trong component đc coi là 1 snapshot => dùng arrrow function để cập nhập liên tiếp, vì nó lấy "Pending state" để tính toán "Next State" mới nhất.
-    > Update Object and Arrays: state is Read-only => nên chỉ "Thay thế" thay vì làm "Thay đổi" object hoặc array state. tránh xa việc mutation (có thể sử dụng Immer)
-    > giá trị khởi tạo, ngoài truyền giá trị chính xác thì có thể sử dụng "Hàm" làm tham số
-    > dùng "Key" để reset component
+    > Update dựa trên previous state:  các state trong component đc coi là 1 snapshot => dùng arrrow function để cập nhập liên tiếp, vì nó lấy 'Pending state' để tính toán 'Next State' mới nhất.
+    > Update Object and Arrays: state is Read-only => nên chỉ 'Thay thế' thay vì làm 'Thay đổi' object hoặc array state. tránh xa việc mutation (có thể sử dụng Immer)
+    > giá trị khởi tạo, ngoài truyền giá trị chính xác thì có thể sử dụng 'Hàm' làm tham số
+    > dùng 'Key' để reset component
 
   + useReducer: Dùng để quản lý state phức tạp hơn, thường kết hợp với một reducer function.
     // const [state, dispatch] = useReducer(reducer, initialArg, init?)
-    >  "reducer" là "Pure function", có 2 parameter: "state" hiện tại và "action" , và trả về "next State"
+    >  'reducer' là 'Pure function', có 2 parameter: 'state' hiện tại và 'action' , và trả về 'next State'
     > initialArg : Trạng thái ban đầu của hook
-    > init? : function để tính toán, nếu ko có thì trả về "initialArg" ngược lại thì lấy "initialArg" làm param đầu vào
-    > useReducer: luôn trả về  [state, dispatch], dispatch function cho phép "cập nhập" state và kích hoạt "re-render"
+    > init? : function để tính toán, nếu ko có thì trả về 'initialArg' ngược lại thì lấy 'initialArg' làm param đầu vào
+    > useReducer: luôn trả về  [state, dispatch], dispatch function cho phép 'cập nhập' state và kích hoạt 're-render'
     > dispatch: pass action làm parameter, chỉ để kích hoạt reducer, không có gia trị trả về
-    > lưu ý là State "chỉ đọc", chỉ "thay thế" nó 
+    > lưu ý là State 'chỉ đọc', chỉ 'thay thế' nó 
 
 - CONTEXT HOOK -
-
   + useContext: Cho phép truy cập vào context từ các thành phần cha mà không cần qua Props
     const value = useContext(SomeContext)
-    > cần tạo context trước, example: ThemeContext = createContext("white | black")
-    > ở compoment Cha sử dụng <ThemeContext value = "abc"></ThemeContext> wrap component con
+    > cần tạo context trước, example: ThemeContext = createContext('white | black')
+    > ở compoment Cha sử dụng <ThemeContext value = 'abc'></ThemeContext> wrap component con
     > ở component cần sử dụng context const theme = useContext(ThemeContext);
     > thay đổi ở value ở context bằng cách sử dụng chung với useState để set lại
   
+- EFFECT HOOKS -
+
+  + useEffect: Cho phép 'Synchroize a Component' với hệ thông ngoài (call api, connect socket, event listner, dom)
+    > useEffect(() => {
+        // Logic side effect
+        return () => {
+          // (option) Cleanup function
+        };
+      }, [dependencies]);
+    > useEffect(setup, [dependencies?])
+    > gọi 'useEffect' ở top của component, có 2 tham số là 'setup' và 'dependency' 
+    > setup: function chứa logic của "Effects", Được thực thi sau khi component render (sau khi DOM được cập nhật). Có thể trả về một cleanup function để dọn dẹp tài nguyên.
+    > Mỗi khi re-render, setup chạy lại khi 'dependency' thay đổi, nó chạy clearnup với giá trị cũ trước và sau đó thực hiện với giá trị mới của dependency. khi component bị xóa khỏi DOM, clearnup sẽ được kích hoạt.
+    > Dependency (option): Một mảng chứa các giá trị mà useEffect phụ thuộc, khi có thay đổi => setup thực hiện lại, có thể là (props, state, variable...). 
+    > Nếu dependency = []  useEffect chỉ chạy 1 lần sau khi component được mount
+    > Nếu không cung cấp dependency array, useEffect chạy sau mỗi lần render
+    > Cleanup function Dùng để dọn dẹp tài nguyên, khi component unmount hoặc trước khi useEffect chạy lại
+    > Mỗi useEffect nên xử lý một side effect cụ thể để code dễ đọc và bảo trì.
+
+  + useLayoutEffect: kích hoạt trước browser vẽ lại screen, có thể đo lại layout ở đây
+  + useInsertionEffect: trước khi React thực hiện thay đổi với DOM, có thể chèn css động ở đây
+
+- REF HOOKS
+  + useRef: là một Hook để tạo tham chiếu bền vững đến DOM elements hoặc giá trị thay đổi mà không gây re-render.
+    > const myRef = useRef(initialValue); gắn ref={myRef} vào DOM
+    > Truy cập trực tiếp vào DOM
+    > Lưu trữ giá trị thay đổi (mutable values) giữa các lần render mà không gây re-render component. 
+    > Thay đổi giá trị của useRef không gây re-render. => Lưu trữ giá trị không cần hiển thị trên giao diện.
+
+- Performance Hooks -   bỏ qua tính toán và re-render lại hông cần thiết
+
+  + useMemo: ghi nhớ kết quả của hàm tính toán, chỉ tính lại khi giá trị phụ thuộc thay đổi
+    > const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);
+    > tham số 1. Hàm tính toán, trả về giá trị muốn ghi nhớ, chạy lại khi mảng phụ thuộc thay đổi
+    > tham số 2. Mảng phụ thuộc, là d/s các biến mà hàm phụ thuộc vào 
+    > dùng với các phép tính tốn kém
+    > Bảo đảm tính bất biến của tham chiếu => cụ thể: hữu ích để tối ưu hóa các component con dựa vào tính bất biến của tham chiếu để ngăn render không cần thiết.
+      Ví dụ: Một component con nhận props là một mảng. Nếu mảng được tạo mới trong mỗi render (dù nội dung không đổi), component con sẽ render lại. useMemo giúp giữ tham chiếu của mảng không đổi.
+    > dùng khi thực sự cần thiết, nhớ khai báo phụ thuộc
+
+  + useCallback: là hook cho phép 'ghi nhớ' các hàm callback trước khi truyền nó xuống 'optimized component', giúp ngăn chặn việc tạo lại hàm trong mỗi lần render, đặc biệt khi bạn truyền hàm cho component con, gây re-render component con không cần thiết
+    > cú pháp:  const memoizedCallback = useCallback(() => {
+                  // Logic của hàm
+                }, [dependencies]);
+    > Hàm callback: Hàm mà bạn muốn ghi nhớ. hữu ích khi bạn sử dụng cùng với React.memo – một công cụ memoize component, giúp component con chỉ re-render khi props thực sự thay đổ
+    > Mảng phụ thuộc (dependencies) Một mảng chứa các giá trị mà hàm callback phụ thuộc vào. Nếu một giá trị trong mảng này thay đổi, hàm sẽ được tạo lại.
+      - Nếu mảng phụ thuộc rỗng ([]), hàm chỉ được tạo một lần và giữ nguyên tham chiếu trong suốt vòng đời của component.
+      - Nếu có phụ thuộc, React sẽ so sánh các giá trị trong mảng bằng Object.is để quyết định xem có cần tạo lại hàm hay không. 
+    > dùng chung với "memo"
+    > dùng khi : Truyền callback cho component con được memoize, tránh re-render không cần thiết.
+
+    > không cần dùng: Nếu hàm không được truyền qua props hoặc component con không phụ thuộc vào tham chiếu của hàm. Và mảng phụ thuộc thay đổi thường xuyên
+    > LƯU Ý: "Quản lý mảng phụ thuộc", cần liệt kê các biến mà callback sử dụng, nếu quên, callb có thể sử dụng giá trị cũ => lỗi logic
+
+- HOOK KHÁC -
+  +  useTransition: Một hook trong React giúp đánh dấu các cập nhật state là "transition" để giữ UI phản hồi nhanh chóng, cải thiện trải nghiệm ng dùng
+  + useDeferredValue: là công cụ hữu ích trong React để trì hoãn render các giá trị không cần cập nhật ngay, giúp ứng dụng phản hồi mượt mà hơn. Nó đặc biệt phù hợp với các tình huống như tìm kiếm hoặc xử lý dữ liệu lớn
+
+### COMPONENT ###
+
+- <Fragment> (<>...</>)
+- <Profiler> : Đo lường 'rendering performance' 
