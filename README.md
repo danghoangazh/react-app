@@ -377,3 +377,34 @@
 
 - <Fragment> (<>...</>)
 - <Profiler> : Đo lường 'rendering performance' 
+- <StrictMode>:  tìm lỗi phổ biến trong component
+- <Suspense> : cho phép hiện thị dự phòng (fallback) trước khi tải xong
+...
+
+### API ###
+
+- act: await act(async actFn) | là công cụ hỗ trợ test
+- cache: const cachedFn = cache(fn) | Chỉ chạy 'React Server Components' - cho phép cache data fetching và hoặc kết quả tính toán
+- createContext: const SomeContext = createContext(defaultValue) | cho phép tạo context
+- lazy: const SomeComponent = lazy(load) | cho phép trì hoãn 'component’s code' cho đến khi được rennder lần đầu
+- memo * : const MemoizedComponent = memo(SomeComponent, arePropsEqual?) => cho phép bỏ qua re-render component khi props không thay đổi (it's memoize component) mặc dù component cha  re-rendered, thích hợp với render component tốn nhiều tài nguyên và props ít thay đổi
+- startTransition
+- use * : const value = use(resource) | cho phép react đọc giá trị từ promise hoặc context
+
+--------------------------------     React-DOM-      --------------------------------
+
+### Hooks ###
+  - useFormStatus:  const { pending, data, method, action } = useFormStatus() | là Hook cung cấp status của form submission, được đặt trong <form></form>, Nó cho phép các component con truy cập vào trạng thái của biểu mẫu cha
+
+### COMPONENT  ###
+
+  - Common components: gồm tất cả build-in component như là <div></div>, <p></p> <img> ...
+    > chi tiết ở đây https://react.dev/reference/react-dom/components/common#reference
+    > pops đặc biêt: 
+      - ref: hỗ trợ truy cập vào dom
+      - dangerouslySetInnerHTML : show string html
+    > các event được trình duyệt hỗ trợ
+
+  - Form: <form action={search}></form>
+    > action có thể là url hoặc 1 function
+    > có thẻ dùng formAction ở button để thay thế
