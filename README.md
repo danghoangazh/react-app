@@ -280,7 +280,7 @@
   + useCallback: Cache hàm, tránh tạo lại hàm mới mỗi lần render, giảm số lần useEffect chạy lại
 
 - Custom Hooks
-  + dùng để tái sử dụng logic giữa các component mà không cần sao chép code, là một hàm
+  + dùng để tái sử dụng logic giữa các component mà không cần sao chép code, là một hàm, return ra các giá trị
   + bắt đầu bằng: use | ví dụ: useFetch, useForm, useLocalStorage.
   + dùng các hook khác bên trong : useState, useEffect, useContext
   + Ko chia sẻ trạng thái, giá trị trả về linh hoạt.
@@ -406,5 +406,42 @@
     > các event được trình duyệt hỗ trợ
 
   - Form: <form action={search}></form>
-    > action có thể là url hoặc 1 function
-    > có thẻ dùng formAction ở button để thay thế
+    > Action có thể là url hoặc 1 function. action có thể bị override bởi formAction ở button
+    > trong form có thể wrap các thể input, button submit, btn clear
+    > dùng useFormStatus để hiển thị trạng thái form
+  - input: <input>  quá quen thuộc
+    > props chi tiết : https://react.dev/reference/react-dom/components/input#controlling-an-input-with-a-state-variable
+    > dùng onChange để trigger lấy dữ liệu từ input. phù hợp với all
+    > checked: boolean => checkbox, radio
+    > value: string => input text
+    > defaultChecked : boolean
+    > defaultValue : String
+    --- ngoài ra thuộc tính khác được ghi trong bài viết
+    > Nếu input đặt trong <form></form> sử dụng e.target để lấy dữ liệu các input (event.target), cần đặt tên cho input
+    > điều khiển giá trị input = state (rất hữu ích) gọi là 'controlled input', cần sử dụng onChange  để cập nhập
+    > lên tách form thành component con, để tránh re-render nhiều cái ko cần thiết
+  - option : 
+    > disabled: boolean
+    > label: string
+    > value: giá trị của option
+  - progress: 
+    > value : number
+    > max : number
+  - select: hiên thị select box 
+    > có onchange để kết hợp state
+  *** ngoài ra <textarea>, <link>, <meta>, <script></script> , <style></style>, <title></title>
+
+### RULES OF REACT
+
+  - COMPONENT and HOOKS phải Pure
+  - Props and state are immutable 
+  - Trả về kết quả mới và ko biến đổi argument của custom Hook
+  - Không gọi trực tiếp 'component functions'
+  - Chỉ gọi hook ở top level
+  - Chỉ gọi hook ở react funtion
+### BEST LIB FOR REACT ###
+ > UI: Material UI, Ant Design, Chakra UI
+ > Routing: React Router
+ > State Management : Redux Toolkit
+ > Form Handling : Formik, React Hook Form
+ > Data Fetching: TanStack Query
