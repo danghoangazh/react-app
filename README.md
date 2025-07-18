@@ -439,9 +439,11 @@
   - Không gọi trực tiếp 'component functions'
   - Chỉ gọi hook ở top level
   - Chỉ gọi hook ở react funtion
+  
 ### BEST LIB FOR REACT ###
  > UI: Material UI, Ant Design, Chakra UI
  > Routing: React Router
  > State Management : Redux Toolkit
  > Form Handling : Formik, React Hook Form
- > Data Fetching: TanStack Query
+ > Data Fetching: TanStack Query.
+
