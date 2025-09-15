@@ -90,11 +90,11 @@ FLOW:
   - Store
   - Dispatch
   - Selector
-- Core Concepts and Principles:
+- Part 2: Core Concepts and Principles:
   - Single Source of Truth: chỉ có 1 store duy nhất để lưu các 'state'
   - State is Read-Only: các duy nhất để update 'state' là gửi 1 'action'
   - Changes are Made with Pure Reducer Functions: is Reducer
-- Step
+- Part 3: State, Actions, and Reducers
   1. Xem xét requirement
   2. thiết kế state: phải là plain JavaScript objects and arrays, để mô tả dữ liệu
   3. thiết kế action: các action có thể xảy ra, nên mô tả một cách ngắn gọn đầy đủ, phải là object có trường 'type'
@@ -105,8 +105,69 @@ FLOW:
   - ko được thực hiện 'asynchronous logic' hoặc "side effects"
   5. Splitting Reducers --- Chia reducer thành các reducer theo 'state' chúng cập nhật, gọi là "reducer composition"
   6. Combining Reducers: Redux store cần 1 'Root Reducer' để tạo ra nó vì thế cần gộp các reducer thành 1
-    sử dụng : combineReducers
+  sử dụng : combineReducers
     const rootReducer = combineReducers({
       todos: todosReducer,
       filters: filtersReducer
+      ...
     })
+  ==> State, Actions, and Reducers : REDUX 
+- Part 4: STORE 
+  Trách nhiệm của 'STORE'
+    - store giữ trạng thái của ứng dunng
+    - cho phép truy cập: Store.getState()
+    - cho phép update qua: store.dispatch(action);
+    - đăng ký listener : store.subscribe(listener); hủy bỏ qua unsubscribe   
+  * Create a Store 
+    - cú pháp: createStore(reducer, preloadedState?, enhancer?)
+      + cần 1 root reducer function
+      + preloadedState nếu có (localstore, hoặc cookie)
+      + Enhancers: hàm có khả năng mở rộng chức năng lưu trữ  của store
+    - CAUSE: cách này đã cũ (nhưng vẫn hđ), lên dùng Redux-toolkit (configureStore)
+  * Dispatching Actions : kích phát hành động đến state
+    gửi đến bộ xử lý, 
+    store.dispatch({ type: 'todos/todoAdded', payload: 'Try creating a store' }) 
+  * Middleware
+    để customize 'dispatch' function, vào thời điểm giữa 'dispatching an action' và  'reaches the reducer'
+    - sử dung: const middlewareEnhancer = applyMiddleware(print1, print2, print3)
+               const store = createStore(rootReducer, middlewareEnhancer)
+      để thêm 
+    - Use Cases 
+      + Log something to the console
+      + Set timeouts
+      + Make asynchronous API calls
+      + Modify the action
+      + Pause the action or even stop it entirely
+      => được tạo ra để chưa các Logic với 'side effects', có thể modify dispatch để xử lý 'Async Logic.'
+    - Writing Custom Middleware: 
+      + Redux middleware : series of three nested functions
+      + 3 lớp: Outer: someCustomMiddleware (or whatever your middleware is called)
+               Middle: wrapDispatch
+               Inner: handleAction
+        => chuyển thành es6:  3 hàm lồng nhau
+        const anotherExampleMiddleware = storeAPI => next => action => {
+        // Do something in here, when each action is dispatched
+        return next(action) }
+  SUMARY: - only Single Store
+          - Store has a single root reducer
+          - Store có 3 method chính: getState , dispatch, subscribe
+          - hàm createStore có cho phép tham số là 'enhancer' => tự tìm hiểu lại "enhancer"
+          - Middleware  là cách chính để customize store
+          - Middleware được thêm vào = 'applyMiddleware' enhancer
+          - Middleware written = 3 hàm lồng nhau (cần tìm hiểu kỹ lại sau)
+          - Middleware được chạy mỗi khi 'action' được dispatch
+          - Middleware có thể chứa 'side effect'
+          - cần sử dụng "The Redux DevTools" trên browsers
+- Part 5: UI and React
+  * Tích hợp UI với Redux
+    thường sẽ theo các bước, dù phức tạp hay đơn giản cũng theo các step 
+    + tạo Redux store
+    + theo dõi thay đổi 
+    + subscription callback call (chính là lấy dl từ state để hiện thị)
+      + lấy state
+      + lấy dữ liệu cần thiết UI
+      + update UI theo data
+    + nếu cần thì hiện thị UI theo init state
+    + Dispatch actions based on UI inputs (kiểu như click để dispatch action)
+  * Dọc trạng thái từ store sử dụng : useSelector
+    

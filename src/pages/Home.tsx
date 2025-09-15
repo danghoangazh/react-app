@@ -1,19 +1,23 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
   const [count, setCount] = useState(0);
-  const [count2, setCount2] = useState(3);
-  console.log("Home render");
-
-  function changeCount() {
-    console.log("changeCount");
-    // const uuid = crypto.randomUUID();
-    setCount(1);
-  }
+  const intervalRef = useRef<number | null>(null);
+  
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      setCount((c) => c + 1);
+    }, 400);
+    
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
   return (
     <>
-      <div className="w-10">Trang chủ {count} -- {count2}</div>
-      <button onClick={changeCount}>change</button>
+      <div className='w-10'>Trang chủ {count} </div>
     </>
   );
 }
